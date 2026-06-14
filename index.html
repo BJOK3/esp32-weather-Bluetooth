@@ -83,10 +83,10 @@
     }
     .log {
       text-align: center;
-      font-size: 13.5px;
-      color: #0066ff;
+      font-size: 14px;
       font-weight: 500;
-      min-height: 22px;
+      color: #0066ff;
+      min-height: 24px;
       padding: 8px;
     }
   </style>
@@ -143,13 +143,11 @@
   let holding = false;
 
   function setLog(msg) {
-    document.getElementById('log').textContent = msg;
-    // 3秒後自動清除提示
+    const logEl = document.getElementById('log');
+    logEl.textContent = msg;
     setTimeout(() => {
-      if (document.getElementById('log').textContent === msg) {
-        document.getElementById('log').textContent = '';
-      }
-    }, 3000);
+      if (logEl.textContent === msg) logEl.textContent = '';
+    }, 2500);
   }
 
   function setConnected(val) {
@@ -168,14 +166,14 @@
     const badge = document.getElementById('mode-badge');
     if (isManual) {
       badge.style.color = '#d32f2f';
-      badge.textContent = '手動模式';
+      badge.textContent = '手動';
     } else {
       badge.style.color = '#2e7d32';
-      badge.textContent = '自動模式';
+      badge.textContent = '自動';
     }
   }
 
-  async function toggleConnect() { /* ... 保持不變 ... */ 
+  async function toggleConnect() {
     if (connected) {
       char = null;
       setConnected(false);
@@ -209,14 +207,15 @@
       await char.writeValue(new TextEncoder().encode(cmd));
       
       if (cmd === 'MANUAL') {
-        isManual = !isManual;
+        isManual = !isManual;           // 切換狀態
         updateModeUI();
         
-        // 明確顯示切換方向
-        const msg = isManual 
-          ? '🔄 已切換為【手動模式】' 
-          : '🔄 已切換為【自動模式】';
-        setLog(msg);
+        // 明確顯示目前是哪一種模式
+        const modeText = isManual ? 
+          '🔴 已切換為【手動模式】' : 
+          '🟢 已切換為【自動模式】';
+        
+        setLog(modeText);
       } else {
         setLog('已送出：' + cmd);
       }
