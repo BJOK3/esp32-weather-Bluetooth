@@ -1,65 +1,65 @@
 
 <style>
-  .container { max-width: 400px; margin: 0 auto; padding: 1.5rem 1rem; }
-  .status-bar { background: var(--color-background-secondary); border: 0.5px solid var(--color-border-tertiary); border-radius: var(--border-radius-lg); padding: 12px 16px; margin-bottom: 1.5rem; display: flex; align-items: center; justify-content: space-between; }
-  .status-dot { width: 8px; height: 8px; border-radius: 50%; background: #B4B2A9; margin-right: 8px; flex-shrink: 0; transition: background 0.3s; }
-  .status-dot.connected { background: #639922; }
-  .status-text { font-size: 13px; color: var(--color-text-secondary); }
-  .mode-badge { font-size: 12px; font-weight: 500; padding: 3px 10px; border-radius: var(--border-radius-md); background: var(--color-background-tertiary); color: var(--color-text-secondary); border: 0.5px solid var(--color-border-tertiary); transition: all 0.3s; }
-  .mode-badge.manual { background: #FAEEDA; color: #633806; border-color: #EF9F27; }
-  .mode-badge.auto { background: #EAF3DE; color: #27500A; border-color: #97C459; }
-  .btn-connect { width: 100%; padding: 14px; border-radius: var(--border-radius-lg); font-size: 15px; font-weight: 500; background: var(--color-background-primary); border: 0.5px solid var(--color-border-secondary); color: var(--color-text-primary); cursor: pointer; margin-bottom: 1.5rem; transition: background 0.15s; display: flex; align-items: center; justify-content: center; gap: 8px; }
-  .btn-connect:hover { background: var(--color-background-secondary); }
-  .btn-connect:active { transform: scale(0.98); }
-  .control-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 12px; }
-  .btn-action { padding: 32px 16px; border-radius: var(--border-radius-lg); font-size: 16px; font-weight: 500; border: 0.5px solid var(--color-border-tertiary); cursor: pointer; display: flex; flex-direction: column; align-items: center; gap: 10px; transition: all 0.15s; background: var(--color-background-primary); color: var(--color-text-primary); }
-  .btn-action i { font-size: 28px; }
-  .btn-action:active { transform: scale(0.97); }
-  .btn-action.close-btn:hover { background: #FAECE7; border-color: #D85A30; color: #4A1B0C; }
-  .btn-action.open-btn:hover { background: #E6F1FB; border-color: #378ADD; color: #042C53; }
-  .btn-action:disabled { opacity: 0.35; cursor: not-allowed; }
-  .btn-mode { width: 100%; padding: 16px; border-radius: var(--border-radius-lg); font-size: 15px; font-weight: 500; border: 0.5px solid var(--color-border-tertiary); cursor: pointer; background: var(--color-background-primary); color: var(--color-text-primary); display: flex; align-items: center; justify-content: center; gap: 8px; transition: all 0.15s; }
+  * { box-sizing: border-box; margin: 0; padding: 0; -webkit-user-select: none; user-select: none; -webkit-touch-callout: none; }
+  .wrap { max-width: 420px; margin: 0 auto; padding: 1.5rem 1rem; }
+  .status-bar { background: var(--color-background-secondary); border: 2px solid var(--color-border-secondary); border-radius: var(--border-radius-lg); padding: 14px 18px; margin-bottom: 1.25rem; display: flex; align-items: center; justify-content: space-between; }
+  .dot { width: 10px; height: 10px; border-radius: 50%; background: #B4B2A9; margin-right: 10px; flex-shrink: 0; transition: background 0.3s; }
+  .dot.on { background: #639922; }
+  .conn-text { font-size: 15px; color: var(--color-text-secondary); }
+  .badge { font-size: 14px; font-weight: 500; padding: 4px 14px; border-radius: var(--border-radius-md); background: var(--color-background-tertiary); color: var(--color-text-secondary); border: 1.5px solid var(--color-border-secondary); transition: all 0.3s; }
+  .badge.manual { background: #FAEEDA; color: #633806; border-color: #EF9F27; }
+  .badge.auto { background: #EAF3DE; color: #27500A; border-color: #97C459; }
+  .btn-conn { width: 100%; padding: 18px; border-radius: var(--border-radius-lg); font-size: 18px; font-weight: 500; background: var(--color-background-primary); border: 2px solid var(--color-border-primary); color: var(--color-text-primary); cursor: pointer; margin-bottom: 1.25rem; display: flex; align-items: center; justify-content: center; gap: 10px; transition: background 0.15s; }
+  .btn-conn:hover { background: var(--color-background-secondary); }
+  .btn-conn:active { transform: scale(0.98); }
+  .btn-conn i { font-size: 22px; }
+  .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin-bottom: 14px; }
+  .btn-act { padding: 44px 16px; border-radius: var(--border-radius-lg); font-size: 20px; font-weight: 500; border: 2px solid var(--color-border-primary); cursor: pointer; display: flex; flex-direction: column; align-items: center; gap: 12px; background: var(--color-background-primary); color: var(--color-text-primary); transition: all 0.15s; touch-action: manipulation; }
+  .btn-act i { font-size: 36px; }
+  .btn-act:disabled { opacity: 0.3; cursor: not-allowed; border-color: var(--color-border-tertiary); }
+  .btn-act.cl:not(:disabled).pressing { background: #FAECE7; border-color: #D85A30; color: #4A1B0C; transform: scale(0.96); }
+  .btn-act.op:not(:disabled).pressing { background: #E6F1FB; border-color: #378ADD; color: #042C53; transform: scale(0.96); }
+  .btn-mode { width: 100%; padding: 20px; border-radius: var(--border-radius-lg); font-size: 18px; font-weight: 500; border: 2px solid var(--color-border-primary); cursor: pointer; background: var(--color-background-primary); color: var(--color-text-primary); display: flex; align-items: center; justify-content: center; gap: 10px; transition: all 0.15s; }
   .btn-mode:hover { background: var(--color-background-secondary); }
   .btn-mode:active { transform: scale(0.98); }
-  .btn-mode:disabled { opacity: 0.35; cursor: not-allowed; }
-  .log { margin-top: 1rem; font-size: 12px; color: var(--color-text-tertiary); font-family: var(--font-mono); min-height: 18px; text-align: center; }
+  .btn-mode:disabled { opacity: 0.3; cursor: not-allowed; border-color: var(--color-border-tertiary); }
+  .btn-mode i { font-size: 22px; }
+  .log { margin-top: 1rem; font-size: 14px; color: var(--color-text-tertiary); font-family: var(--font-mono); min-height: 20px; text-align: center; }
 </style>
 
-<div class="container">
+<div class="wrap">
   <h2 class="sr-only">Smart Hanger 藍牙控制台</h2>
 
   <div class="status-bar">
     <div style="display:flex;align-items:center;">
-      <div class="status-dot" id="dot"></div>
-      <span class="status-text" id="conn-text">未連線</span>
+      <div class="dot" id="dot"></div>
+      <span class="conn-text" id="conn-text">未連線</span>
     </div>
-    <span class="mode-badge" id="mode-badge">—</span>
+    <span class="badge" id="badge">—</span>
   </div>
 
-  <button class="btn-connect" id="btn-connect" onclick="toggleConnect()">
+  <button class="btn-conn" id="btn-conn" onclick="toggleConnect()">
     <i class="ti ti-bluetooth" aria-hidden="true"></i>
-    <span id="connect-label">連線裝置</span>
+    <span id="conn-label">連線裝置</span>
   </button>
 
-  <div class="control-grid">
-    <button class="btn-action close-btn" id="btn-close"
-      onmousedown="sendHold('CLOSE_DOWN')" onmouseup="sendHold('UP')"
-      ontouchstart="sendHold('CLOSE_DOWN')" ontouchend="sendHold('UP')"
-      disabled>
+  <div class="grid">
+    <button class="btn-act cl" id="btn-close" disabled
+      onmousedown="holdStart('CLOSE_DOWN',this)" onmouseup="holdEnd(this)" onmouseleave="holdEnd(this)"
+      ontouchstart="holdStart('CLOSE_DOWN',this)" ontouchend="holdEnd(this)" ontouchcancel="holdEnd(this)">
       <i class="ti ti-arrow-up" aria-hidden="true"></i>
       收衣
     </button>
-    <button class="btn-action open-btn" id="btn-open"
-      onmousedown="sendHold('OPEN_DOWN')" onmouseup="sendHold('UP')"
-      ontouchstart="sendHold('OPEN_DOWN')" ontouchend="sendHold('UP')"
-      disabled>
+    <button class="btn-act op" id="btn-open" disabled
+      onmousedown="holdStart('OPEN_DOWN',this)" onmouseup="holdEnd(this)" onmouseleave="holdEnd(this)"
+      ontouchstart="holdStart('OPEN_DOWN',this)" ontouchend="holdEnd(this)" ontouchcancel="holdEnd(this)">
       <i class="ti ti-arrow-down" aria-hidden="true"></i>
       放衣
     </button>
   </div>
 
   <button class="btn-mode" id="btn-mode" onclick="send('MANUAL')" disabled>
-    <i class="ti ti-refresh" aria-hidden="true" id="mode-icon"></i>
+    <i class="ti ti-refresh" aria-hidden="true"></i>
     <span id="mode-label">切換手動 / 自動</span>
   </button>
 
@@ -70,99 +70,66 @@
   let char = null;
   let connected = false;
   let isManual = false;
-  let isTouching = false;
+  let holding = false;
 
-  function setLog(msg) {
-    document.getElementById('log').textContent = msg;
-  }
+  function setLog(msg) { document.getElementById('log').textContent = msg; }
 
   function setConnected(val) {
     connected = val;
-    document.getElementById('dot').className = 'status-dot' + (val ? ' connected' : '');
+    document.getElementById('dot').className = 'dot' + (val ? ' on' : '');
     document.getElementById('conn-text').textContent = val ? '已連線 SmartHanger_S3' : '未連線';
-    document.getElementById('connect-label').textContent = val ? '中斷連線' : '連線裝置';
+    document.getElementById('conn-label').textContent = val ? '中斷連線' : '連線裝置';
     document.getElementById('btn-close').disabled = !val;
     document.getElementById('btn-open').disabled = !val;
     document.getElementById('btn-mode').disabled = !val;
-    if (!val) {
-      document.getElementById('mode-badge').className = 'mode-badge';
-      document.getElementById('mode-badge').textContent = '—';
-    }
+    if (!val) { const b = document.getElementById('badge'); b.className = 'badge'; b.textContent = '—'; }
   }
 
   function updateModeUI() {
-    const badge = document.getElementById('mode-badge');
-    const label = document.getElementById('mode-label');
-    if (isManual) {
-      badge.className = 'mode-badge manual';
-      badge.textContent = '手動';
-      label.textContent = '切換為自動模式';
-    } else {
-      badge.className = 'mode-badge auto';
-      badge.textContent = '自動';
-      label.textContent = '切換為手動模式';
-    }
+    const b = document.getElementById('badge');
+    const l = document.getElementById('mode-label');
+    if (isManual) { b.className = 'badge manual'; b.textContent = '手動'; l.textContent = '切換為自動模式'; }
+    else { b.className = 'badge auto'; b.textContent = '自動'; l.textContent = '切換為手動模式'; }
   }
 
   async function toggleConnect() {
-    if (connected) {
-      char = null;
-      setConnected(false);
-      setLog('已中斷連線');
-      return;
-    }
+    if (connected) { char = null; setConnected(false); setLog('已中斷連線'); return; }
     try {
       setLog('搜尋中...');
       const device = await navigator.bluetooth.requestDevice({
         filters: [{ name: 'SmartHanger_S3' }],
         optionalServices: ['12345678-1234-1234-1234-1234567890ab']
       });
-      device.addEventListener('gattserverdisconnected', () => {
-        setConnected(false);
-        setLog('裝置已斷線');
-        char = null;
-      });
+      device.addEventListener('gattserverdisconnected', () => { setConnected(false); setLog('裝置已斷線'); char = null; });
       setLog('連線中...');
       const server = await device.gatt.connect();
       const service = await server.getPrimaryService('12345678-1234-1234-1234-1234567890ab');
       char = await service.getCharacteristic('abcd1234-1234-1234-1234-abcdef123456');
-      setConnected(true);
-      isManual = false;
-      updateModeUI();
-      setLog('連線成功');
-    } catch (e) {
-      setLog('連線失敗：' + e.message);
-    }
+      setConnected(true); isManual = false; updateModeUI(); setLog('連線成功');
+    } catch(e) { setLog('連線失敗：' + e.message); }
   }
 
   async function send(cmd) {
     if (!char) return;
     try {
       await char.writeValue(new TextEncoder().encode(cmd));
-      if (cmd === 'MANUAL') {
-        isManual = !isManual;
-        updateModeUI();
-        setLog('切換為' + (isManual ? '手動' : '自動') + '模式');
-      } else {
-        setLog('已送出：' + cmd);
-      }
-    } catch (e) {
-      setLog('指令失敗：' + e.message);
-    }
+      if (cmd === 'MANUAL') { isManual = !isManual; updateModeUI(); setLog('切換為' + (isManual ? '手動' : '自動') + '模式'); }
+      else { setLog('已送出：' + cmd); }
+    } catch(e) { setLog('指令失敗：' + e.message); }
   }
 
-  async function sendHold(cmd) {
-    if (!char) return;
-    if (cmd !== 'UP' && isTouching) return;
-    if (cmd !== 'UP') isTouching = true;
-    else isTouching = false;
-    try {
-      await char.writeValue(new TextEncoder().encode(cmd));
-      setLog('已送出：' + cmd);
-    } catch (e) {
-      setLog('指令失敗：' + e.message);
-    }
+  function holdStart(cmd, el) {
+    if (!char || holding) return;
+    holding = true;
+    el.classList.add('pressing');
+    send(cmd);
+  }
+
+  function holdEnd(el) {
+    if (!holding) return;
+    holding = false;
+    el.classList.remove('pressing');
+    send('UP');
   }
 </script>
-
 
