@@ -42,11 +42,17 @@
   </button>
 
   <div class="control-grid">
-    <button class="btn-action close-btn" id="btn-close" onclick="send('CLOSE')" disabled>
+    <button class="btn-action close-btn" id="btn-close"
+      onmousedown="sendHold('CLOSE_DOWN')" onmouseup="sendHold('UP')"
+      ontouchstart="sendHold('CLOSE_DOWN')" ontouchend="sendHold('UP')"
+      disabled>
       <i class="ti ti-arrow-up" aria-hidden="true"></i>
       收衣
     </button>
-    <button class="btn-action open-btn" id="btn-open" onclick="send('OPEN')" disabled>
+    <button class="btn-action open-btn" id="btn-open"
+      onmousedown="sendHold('OPEN_DOWN')" onmouseup="sendHold('UP')"
+      ontouchstart="sendHold('OPEN_DOWN')" ontouchend="sendHold('UP')"
+      disabled>
       <i class="ti ti-arrow-down" aria-hidden="true"></i>
       放衣
     </button>
@@ -64,6 +70,7 @@
   let char = null;
   let connected = false;
   let isManual = false;
+  let isTouching = false;
 
   function setLog(msg) {
     document.getElementById('log').textContent = msg;
@@ -143,5 +150,19 @@
       setLog('指令失敗：' + e.message);
     }
   }
+
+  async function sendHold(cmd) {
+    if (!char) return;
+    if (cmd !== 'UP' && isTouching) return;
+    if (cmd !== 'UP') isTouching = true;
+    else isTouching = false;
+    try {
+      await char.writeValue(new TextEncoder().encode(cmd));
+      setLog('已送出：' + cmd);
+    } catch (e) {
+      setLog('指令失敗：' + e.message);
+    }
+  }
 </script>
+
 
