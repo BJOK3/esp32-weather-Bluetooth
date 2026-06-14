@@ -2,53 +2,49 @@
 <html lang="zh-TW">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <title>Smart Hanger 控制台</title>
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/dist/tabler-icons.min.css">
   <style>
-    :root {
-      --primary: #0066ff;
-      --danger: #ff3b5c;
-      --success: #00c853;
-    }
+    :root { --primary: #0066ff; }
     body { 
       font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; 
       background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
-      margin: 0; padding: 0; min-height: 100vh;
+      margin: 0; padding: 12px 0; min-height: 100vh;
     }
-    .container { max-width: 420px; margin: 20px auto; padding: 20px; }
+    .container { max-width: 380px; margin: 10px auto; padding: 0 12px; }
     .card {
       background: white;
       border-radius: 20px;
-      box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+      box-shadow: 0 8px 25px rgba(0,0,0,0.12);
       overflow: hidden;
     }
     .header {
       background: linear-gradient(90deg, #0066ff, #00b0ff);
       color: white;
-      padding: 20px;
+      padding: 16px 20px;
       text-align: center;
     }
+    .header h2 { margin: 0; font-size: 22px; }
+    .header p { margin: 4px 0 0; font-size: 14px; opacity: 0.95; }
+
     .status-bar {
-      padding: 12px 20px;
+      padding: 10px 20px;
       display: flex;
       justify-content: space-between;
       align-items: center;
       background: #f8f9fa;
-      border-bottom: 1px solid #eee;
+      font-size: 14px;
     }
     .status-dot { 
-      width: 12px; height: 12px; border-radius: 50%; 
-      background: #bbb; transition: 0.3s; 
+      width: 10px; height: 10px; border-radius: 50%; 
+      background: #bbb; display: inline-block; margin-right: 6px;
     }
-    .status-dot.connected { 
-      background: #00c853; 
-      box-shadow: 0 0 8px #00c853; 
-    }
-    
+    .status-dot.connected { background: #00c853; box-shadow: 0 0 6px #00c853; }
+
     .btn-connect {
-      width: 100%;
-      margin: 15px 20px;
+      width: calc(100% - 24px);
+      margin: 12px 12px;
       padding: 14px;
       font-size: 16px;
       font-weight: 600;
@@ -56,48 +52,42 @@
       background: var(--primary);
       color: white;
       border: none;
-      cursor: pointer;
     }
-    .btn-connect:hover { background: #0055dd; }
 
     .control-grid { 
-      display: grid; 
-      grid-template-columns: 1fr 1fr; 
-      gap: 16px; 
-      padding: 0 20px 20px; 
+      display: grid; grid-template-columns: 1fr 1fr; 
+      gap: 12px; padding: 0 12px 12px; 
     }
     .btn-action {
-      height: 140px;
+      height: 118px;
       border-radius: 16px;
-      font-size: 18px;
-      font-weight: 600;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      gap: 12px;
-      transition: all 0.2s;
-      box-shadow: 0 4px 15px rgba(0,0,0,0.1);
-    }
-    .btn-action:active { transform: scale(0.95); }
-    .close-btn { background: #ffebee; color: #d32f2f; border: 2px solid #ffcdd2; }
-    .open-btn { background: #e8f5e9; color: #2e7d32; border: 2px solid #c8e6c9; }
-    
-    .btn-mode {
-      margin: 0 20px 20px;
-      padding: 16px;
       font-size: 17px;
       font-weight: 600;
-      border-radius: 16px;
+      display: flex; flex-direction: column;
+      align-items: center; justify-content: center;
+      gap: 8px;
+      box-shadow: 0 3px 12px rgba(0,0,0,0.1);
+    }
+    .btn-action:active { transform: scale(0.96); }
+    .close-btn { background: #ffebee; color: #d32f2f; border: 2px solid #ffcdd2; }
+    .open-btn { background: #e8f5e9; color: #2e7d32; border: 2px solid #c8e6c9; }
+
+    .btn-mode {
+      margin: 8px 12px 16px;
+      padding: 14px;
+      font-size: 15.5px;
+      font-weight: 600;
+      border-radius: 12px;
       background: #f0f0f0;
       border: 1px solid #ddd;
     }
     .log {
       text-align: center;
-      font-size: 13px;
-      color: #666;
-      min-height: 24px;
-      padding: 10px;
+      font-size: 13.5px;
+      color: #0066ff;
+      font-weight: 500;
+      min-height: 22px;
+      padding: 8px;
     }
   </style>
 </head>
@@ -110,17 +100,15 @@
     </div>
 
     <div class="status-bar">
-      <div style="display:flex;align-items:center;">
-        <div class="status-dot" id="dot"></div>
+      <div>
+        <span class="status-dot" id="dot"></span>
         <span id="conn-text">未連線</span>
       </div>
-      <span class="mode-badge" id="mode-badge">—</span>
+      <span id="mode-badge" style="font-weight:600;">—</span>
     </div>
 
-    <!-- 連線按鈕 -->
     <button class="btn-connect" id="btn-connect" onclick="toggleConnect()">
-      <i class="ti ti-bluetooth" style="font-size:20px"></i>
-      <span id="connect-label">連線裝置</span>
+      <i class="ti ti-bluetooth"></i> 連線裝置
     </button>
 
     <div class="control-grid">
@@ -128,21 +116,20 @@
         onmousedown="sendHold('CLOSE_DOWN')" onmouseup="sendHold('UP')"
         ontouchstart="sendHold('CLOSE_DOWN')" ontouchend="sendHold('UP')"
         disabled>
-        <i class="ti ti-arrow-up" style="font-size:42px"></i>
+        <i class="ti ti-arrow-up" style="font-size:38px"></i>
         <span>收衣</span>
       </button>
       <button class="btn-action open-btn" id="btn-open"
         onmousedown="sendHold('OPEN_DOWN')" onmouseup="sendHold('UP')"
         ontouchstart="sendHold('OPEN_DOWN')" ontouchend="sendHold('UP')"
         disabled>
-        <i class="ti ti-arrow-down" style="font-size:42px"></i>
+        <i class="ti ti-arrow-down" style="font-size:38px"></i>
         <span>放衣</span>
       </button>
     </div>
 
     <button class="btn-mode" id="btn-mode" onclick="send('MANUAL')" disabled>
-      <i class="ti ti-refresh" id="mode-icon"></i>
-      <span id="mode-label">切換手動 / 自動</span>
+      <i class="ti ti-refresh"></i> 切換手動 / 自動
     </button>
 
     <div class="log" id="log"></div>
@@ -157,16 +144,21 @@
 
   function setLog(msg) {
     document.getElementById('log').textContent = msg;
+    // 3秒後自動清除提示
+    setTimeout(() => {
+      if (document.getElementById('log').textContent === msg) {
+        document.getElementById('log').textContent = '';
+      }
+    }, 3000);
   }
 
   function setConnected(val) {
     connected = val;
-    const dot = document.getElementById('dot');
-    dot.className = 'status-dot' + (val ? ' connected' : '');
-    
+    document.getElementById('dot').className = 'status-dot' + (val ? ' connected' : '');
     document.getElementById('conn-text').textContent = val ? '已連線 SmartHanger_S3' : '未連線';
-    document.getElementById('connect-label').textContent = val ? '中斷連線' : '連線裝置';
-    
+    document.getElementById('btn-connect').innerHTML = val 
+      ? '<i class="ti ti-bluetooth-off"></i> 中斷連線' 
+      : '<i class="ti ti-bluetooth"></i> 連線裝置';
     document.getElementById('btn-close').disabled = !val;
     document.getElementById('btn-open').disabled = !val;
     document.getElementById('btn-mode').disabled = !val;
@@ -174,19 +166,16 @@
 
   function updateModeUI() {
     const badge = document.getElementById('mode-badge');
-    const label = document.getElementById('mode-label');
     if (isManual) {
-      badge.className = 'mode-badge manual';
-      badge.textContent = '手動';
-      label.textContent = '切換為自動模式';
+      badge.style.color = '#d32f2f';
+      badge.textContent = '手動模式';
     } else {
-      badge.className = 'mode-badge auto';
-      badge.textContent = '自動';
-      label.textContent = '切換為手動模式';
+      badge.style.color = '#2e7d32';
+      badge.textContent = '自動模式';
     }
   }
 
-  async function toggleConnect() {
+  async function toggleConnect() { /* ... 保持不變 ... */ 
     if (connected) {
       char = null;
       setConnected(false);
@@ -199,12 +188,8 @@
         filters: [{ name: 'SmartHanger_S3' }],
         optionalServices: ['12345678-1234-1234-1234-1234567890ab']
       });
-      device.addEventListener('gattserverdisconnected', () => {
-        setConnected(false);
-        setLog('裝置已斷線');
-        char = null;
-      });
-      setLog('連線中...');
+      device.addEventListener('gattserverdisconnected', () => { setConnected(false); setLog('裝置已斷線'); char = null; });
+      
       const server = await device.gatt.connect();
       const service = await server.getPrimaryService('12345678-1234-1234-1234-1234567890ab');
       char = await service.getCharacteristic('abcd1234-1234-1234-1234-abcdef123456');
@@ -212,9 +197,9 @@
       setConnected(true);
       isManual = false;
       updateModeUI();
-      setLog('連線成功');
+      setLog('✅ 連線成功');
     } catch(e) {
-      setLog('連線失敗：' + e.message);
+      setLog('❌ 連線失敗：' + e.message);
     }
   }
 
@@ -222,15 +207,21 @@
     if (!char) return;
     try {
       await char.writeValue(new TextEncoder().encode(cmd));
+      
       if (cmd === 'MANUAL') {
         isManual = !isManual;
         updateModeUI();
-        setLog('切換為' + (isManual ? '手動' : '自動') + '模式');
+        
+        // 明確顯示切換方向
+        const msg = isManual 
+          ? '🔄 已切換為【手動模式】' 
+          : '🔄 已切換為【自動模式】';
+        setLog(msg);
       } else {
         setLog('已送出：' + cmd);
       }
     } catch(e) {
-      setLog('指令失敗：' + e.message);
+      setLog('指令失敗');
     }
   }
 
@@ -239,8 +230,7 @@
     if (cmd === 'UP') {
       holding = false;
       send('UP');
-    } else {
-      if (holding) return;
+    } else if (!holding) {
       holding = true;
       send(cmd);
     }
