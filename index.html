@@ -72,7 +72,6 @@
     .close-btn { background: #ffebee; color: #d32f2f; border: 2px solid #ffcdd2; }
     .open-btn { background: #e8f5e9; color: #2e7d32; border: 2px solid #c8e6c9; }
 
-    /* 新增：兩個模式按鈕 */
     .mode-grid {
       display: grid;
       grid-template-columns: 1fr 1fr;
@@ -80,24 +79,16 @@
       padding: 0 12px 16px;
     }
     .btn-mode {
-      padding: 14px;
-      font-size: 15.5px;
+      padding: 16px;
+      font-size: 16px;
       font-weight: 600;
       border-radius: 12px;
       border: 2px solid;
       cursor: pointer;
     }
-    .btn-manual {
-      background: #ffebee;
-      color: #d32f2f;
-      border-color: #ffcdd2;
-    }
-    .btn-auto {
-      background: #e8f5e9;
-      color: #2e7d32;
-      border-color: #c8e6c9;
-    }
-
+    .btn-manual { background: #ffebee; color: #d32f2f; border-color: #d32f2f; }
+    .btn-auto   { background: #e8f5e9; color: #2e7d32; border-color: #2e7d32; }
+    
     .log {
       text-align: center;
       font-size: 14px;
@@ -145,7 +136,6 @@
       </button>
     </div>
 
-    <!-- 新增兩個模式按鈕 -->
     <div class="mode-grid">
       <button class="btn-mode btn-manual" id="btn-manual" onclick="setMode(true)" disabled>
         🔴 手動模式
@@ -195,10 +185,12 @@
     }
   }
 
+  // === 新增：直接設定模式 ===
   async function setMode(manual) {
     if (!char) return;
+    const cmd = manual ? "SET_MANUAL" : "SET_AUTO";
     try {
-      await char.writeValue(new TextEncoder().encode('MANUAL'));
+      await char.writeValue(new TextEncoder().encode(cmd));
       isManual = manual;
       updateModeUI();
       
@@ -211,7 +203,7 @@
     }
   }
 
-  async function toggleConnect() { /* 保持不變 */ 
+  async function toggleConnect() {
     if (connected) {
       char = null;
       setConnected(false);
