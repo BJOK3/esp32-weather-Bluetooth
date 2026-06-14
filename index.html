@@ -15,12 +15,16 @@
     <p>ESP32 IP: <span id="ip-display">等待輸入...</span></p>
 
     <button
+        autocorrect="off" 
+        autocomplete="off"
         onmousedown="send('OPEN_DOWN')" onmouseup="send('UP')"
         ontouchstart="send('OPEN_DOWN')" ontouchend="send('UP')">
         OPEN
     </button>
 
     <button
+        autocorrect="off" 
+        autocomplete="off"
         onmousedown="send('CLOSE_DOWN')" onmouseup="send('UP')"
         ontouchstart="send('CLOSE_DOWN')" ontouchend="send('UP')">
         CLOSE
