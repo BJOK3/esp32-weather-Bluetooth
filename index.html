@@ -92,7 +92,7 @@
     .btn-refresh {
       width: calc(100% - 24px);
       margin: 0 12px 12px;
-      padding: 12px;
+      padding: 13px;
       font-size: 15px;
       font-weight: 600;
       border-radius: 12px;
@@ -158,8 +158,8 @@
       </button>
     </div>
 
-    <!-- 新增：更新資料按鈕 -->
-    <button class="btn-refresh" onclick="refreshData()">
+    <!-- 更新氣象資料按鈕 -->
+    <button class="btn-refresh" onclick="refreshData()" disabled id="btn-refresh">
       <i class="ti ti-refresh"></i> 更新氣象資料
     </button>
 
@@ -176,7 +176,7 @@
   function setLog(msg) {
     const logEl = document.getElementById('log');
     logEl.textContent = msg;
-    setTimeout(() => { if (logEl.textContent === msg) logEl.textContent = ''; }, 2800);
+    setTimeout(() => { if (logEl.textContent === msg) logEl.textContent = ''; }, 3000);
   }
 
   function setConnected(val) {
@@ -186,10 +186,13 @@
     document.getElementById('btn-connect').innerHTML = val 
       ? '<i class="ti ti-bluetooth-off"></i> 中斷連線' 
       : '<i class="ti ti-bluetooth"></i> 連線裝置';
-    document.getElementById('btn-close').disabled = !val;
-    document.getElementById('btn-open').disabled = !val;
-    document.getElementById('btn-manual').disabled = !val;
-    document.getElementById('btn-auto').disabled = !val;
+    
+    const isEnabled = val;
+    document.getElementById('btn-close').disabled = !isEnabled;
+    document.getElementById('btn-open').disabled = !isEnabled;
+    document.getElementById('btn-manual').disabled = !isEnabled;
+    document.getElementById('btn-auto').disabled = !isEnabled;
+    document.getElementById('btn-refresh').disabled = !isEnabled;
   }
 
   function updateModeUI() {
@@ -210,28 +213,25 @@
       await char.writeValue(new TextEncoder().encode(cmd));
       isManual = manual;
       updateModeUI();
-      const msg = manual ? '🔴 已切換為【手動模式】' : '🟢 已切換為【自動模式】';
-      setLog(msg);
+      setLog(manual ? '🔴 已切換為【手動模式】' : '🟢 已切換為【自動模式】');
     } catch(e) {
       setLog('切換失敗');
     }
   }
 
-  // 新增：更新氣象資料
+  // === 新增：按下後傳送 REFRESH 給 ESP32 ===
   async function refreshData() {
-    setLog('⏳ 正在更新氣象資料...');
+    if (!char) return;
+    setLog('⏳ 正在要求更新氣象資料...');
     try {
-      const res = await fetch('/hanger/status');
-      const text = await res.text();
-      setLog('✅ 氣象資料已更新');
-      // 可選：強制刷新狀態顯示
-      console.log('最新狀態:', text);
+      await char.writeValue(new TextEncoder().encode("REFRESH"));
+      setLog('✅ 已傳送 REFRESH 指令');
     } catch(e) {
-      setLog('❌ 更新失敗');
+      setLog('❌ 傳送失敗');
     }
   }
 
-  async function toggleConnect() {
+  async function toggleConnect() { /* ... 保持不變 ... */ 
     if (connected) {
       char = null;
       setConnected(false);
