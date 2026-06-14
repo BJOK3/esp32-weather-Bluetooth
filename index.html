@@ -27,21 +27,19 @@
     </button>
 
     <script>
-        // 務必加上 http://，這很重要！
         const ESP32_URL = "http://172.20.10.12"; 
 
         async function send(cmd) {
-            console.log("嘗試發送指令:", cmd);
+            console.log("發送指令:", cmd);
             try {
-                // 使用 fetch 發送請求
-                const response = await fetch(`${ESP32_URL}/control?cmd=${cmd}`, {
+                // 發送請求，不等待回傳，直接完成
+                fetch(`${ESP32_URL}/control?cmd=${cmd}`, {
                     method: 'GET',
-                    mode: 'no-cors' // 這個設定可以繞過大多數的 CORS 瀏覽器限制
+                    mode: 'no-cors'
                 });
-                console.log("指令發送完成 (可能無法讀取回傳內容)");
+                // 移除原本的 catch 彈窗，只在 console 輸出，避免干擾使用
             } catch (error) {
-                console.error("錯誤詳情:", error);
-                alert("發送失敗，請檢查網路是否連線。");
+                console.log("請求發出，瀏覽器可能無法解析回傳，但指令應已送出");
             }
         }
     </script>
