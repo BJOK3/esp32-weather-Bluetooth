@@ -1,69 +1,119 @@
-
-<style>
-  * { box-sizing: border-box; margin: 0; padding: 0; -webkit-user-select: none; user-select: none; -webkit-touch-callout: none; }
-  .wrap { max-width: 420px; margin: 0 auto; padding: 1.5rem 1rem; }
-  .status-bar { background: var(--color-background-secondary); border: 2px solid var(--color-border-secondary); border-radius: var(--border-radius-lg); padding: 14px 18px; margin-bottom: 1.25rem; display: flex; align-items: center; justify-content: space-between; }
-  .dot { width: 10px; height: 10px; border-radius: 50%; background: #B4B2A9; margin-right: 10px; flex-shrink: 0; transition: background 0.3s; }
-  .dot.on { background: #639922; }
-  .conn-text { font-size: 15px; color: var(--color-text-secondary); }
-  .badge { font-size: 14px; font-weight: 500; padding: 4px 14px; border-radius: var(--border-radius-md); background: var(--color-background-tertiary); color: var(--color-text-secondary); border: 1.5px solid var(--color-border-secondary); transition: all 0.3s; }
-  .badge.manual { background: #FAEEDA; color: #633806; border-color: #EF9F27; }
-  .badge.auto { background: #EAF3DE; color: #27500A; border-color: #97C459; }
-  .btn-conn { width: 100%; padding: 18px; border-radius: var(--border-radius-lg); font-size: 18px; font-weight: 500; background: var(--color-background-primary); border: 2px solid var(--color-border-primary); color: var(--color-text-primary); cursor: pointer; margin-bottom: 1.25rem; display: flex; align-items: center; justify-content: center; gap: 10px; transition: background 0.15s; }
-  .btn-conn:hover { background: var(--color-background-secondary); }
-  .btn-conn:active { transform: scale(0.98); }
-  .btn-conn i { font-size: 22px; }
-  .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin-bottom: 14px; }
-  .btn-act { padding: 44px 16px; border-radius: var(--border-radius-lg); font-size: 20px; font-weight: 500; border: 2px solid var(--color-border-primary); cursor: pointer; display: flex; flex-direction: column; align-items: center; gap: 12px; background: var(--color-background-primary); color: var(--color-text-primary); transition: all 0.15s; touch-action: manipulation; }
-  .btn-act i { font-size: 36px; }
-  .btn-act:disabled { opacity: 0.3; cursor: not-allowed; border-color: var(--color-border-tertiary); }
-  .btn-act.cl:not(:disabled).pressing { background: #FAECE7; border-color: #D85A30; color: #4A1B0C; transform: scale(0.96); }
-  .btn-act.op:not(:disabled).pressing { background: #E6F1FB; border-color: #378ADD; color: #042C53; transform: scale(0.96); }
-  .btn-mode { width: 100%; padding: 20px; border-radius: var(--border-radius-lg); font-size: 18px; font-weight: 500; border: 2px solid var(--color-border-primary); cursor: pointer; background: var(--color-background-primary); color: var(--color-text-primary); display: flex; align-items: center; justify-content: center; gap: 10px; transition: all 0.15s; }
-  .btn-mode:hover { background: var(--color-background-secondary); }
-  .btn-mode:active { transform: scale(0.98); }
-  .btn-mode:disabled { opacity: 0.3; cursor: not-allowed; border-color: var(--color-border-tertiary); }
-  .btn-mode i { font-size: 22px; }
-  .log { margin-top: 1rem; font-size: 14px; color: var(--color-text-tertiary); font-family: var(--font-mono); min-height: 20px; text-align: center; }
-</style>
-
-<div class="wrap">
-  <h2 class="sr-only">Smart Hanger 藍牙控制台</h2>
-
-  <div class="status-bar">
-    <div style="display:flex;align-items:center;">
-      <div class="dot" id="dot"></div>
-      <span class="conn-text" id="conn-text">未連線</span>
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Smart Hanger 控制台</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/dist/tabler-icons.min.css">
+  <style>
+    :root {
+      --primary: #0066ff;
+      --danger: #ff3b5c;
+      --success: #00c853;
+    }
+    body { 
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; 
+      background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+      margin: 0; padding: 0; min-height: 100vh;
+    }
+    .container { max-width: 420px; margin: 20px auto; padding: 20px; }
+    .card {
+      background: white;
+      border-radius: 20px;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+      overflow: hidden;
+    }
+    .header {
+      background: linear-gradient(90deg, #0066ff, #00b0ff);
+      color: white;
+      padding: 20px;
+      text-align: center;
+    }
+    .status-bar {
+      padding: 12px 20px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      background: #f8f9fa;
+      border-bottom: 1px solid #eee;
+    }
+    .status-dot { width: 12px; height: 12px; border-radius: 50%; background: #bbb; transition: 0.3s; }
+    .status-dot.connected { background: #00c853; box-shadow: 0 0 8px #00c853; }
+    
+    .control-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; padding: 20px; }
+    .btn-action {
+      height: 140px;
+      border-radius: 16px;
+      font-size: 18px;
+      font-weight: 600;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 12px;
+      transition: all 0.2s;
+      box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+    }
+    .btn-action:active { transform: scale(0.95); }
+    .close-btn { background: #ffebee; color: #d32f2f; border: 2px solid #ffcdd2; }
+    .open-btn { background: #e8f5e9; color: #2e7d32; border: 2px solid #c8e6c9; }
+    
+    .btn-mode {
+      margin: 0 20px 20px;
+      padding: 16px;
+      font-size: 17px;
+      font-weight: 600;
+      border-radius: 16px;
+    }
+    .log {
+      text-align: center;
+      font-size: 13px;
+      color: #666;
+      min-height: 24px;
+      padding: 10px;
+    }
+  </style>
+</head>
+<body>
+<div class="container">
+  <div class="card">
+    <div class="header">
+      <h2>🧥 Smart Hanger</h2>
+      <p>智慧衣架控制台</p>
     </div>
-    <span class="badge" id="badge">—</span>
-  </div>
 
-  <button class="btn-conn" id="btn-conn" onclick="toggleConnect()">
-    <i class="ti ti-bluetooth" aria-hidden="true"></i>
-    <span id="conn-label">連線裝置</span>
-  </button>
+    <div class="status-bar">
+      <div style="display:flex;align-items:center;">
+        <div class="status-dot" id="dot"></div>
+        <span id="conn-text">未連線</span>
+      </div>
+      <span class="mode-badge" id="mode-badge">—</span>
+    </div>
 
-  <div class="grid">
-    <button class="btn-act cl" id="btn-close" disabled
-      onmousedown="holdStart('CLOSE_DOWN',this)" onmouseup="holdEnd(this)" onmouseleave="holdEnd(this)"
-      ontouchstart="holdStart('CLOSE_DOWN',this)" ontouchend="holdEnd(this)" ontouchcancel="holdEnd(this)">
-      <i class="ti ti-arrow-up" aria-hidden="true"></i>
-      收衣
+    <div class="control-grid">
+      <button class="btn-action close-btn" id="btn-close"
+        onmousedown="sendHold('CLOSE_DOWN')" onmouseup="sendHold('UP')"
+        ontouchstart="sendHold('CLOSE_DOWN')" ontouchend="sendHold('UP')"
+        disabled>
+        <i class="ti ti-arrow-up" style="font-size:42px"></i>
+        <span>收衣</span>
+      </button>
+      <button class="btn-action open-btn" id="btn-open"
+        onmousedown="sendHold('OPEN_DOWN')" onmouseup="sendHold('UP')"
+        ontouchstart="sendHold('OPEN_DOWN')" ontouchend="sendHold('UP')"
+        disabled>
+        <i class="ti ti-arrow-down" style="font-size:42px"></i>
+        <span>放衣</span>
+      </button>
+    </div>
+
+    <button class="btn-mode" id="btn-mode" onclick="send('MANUAL')" disabled>
+      <i class="ti ti-refresh" id="mode-icon"></i>
+      <span id="mode-label">切換手動 / 自動</span>
     </button>
-    <button class="btn-act op" id="btn-open" disabled
-      onmousedown="holdStart('OPEN_DOWN',this)" onmouseup="holdEnd(this)" onmouseleave="holdEnd(this)"
-      ontouchstart="holdStart('OPEN_DOWN',this)" ontouchend="holdEnd(this)" ontouchcancel="holdEnd(this)">
-      <i class="ti ti-arrow-down" aria-hidden="true"></i>
-      放衣
-    </button>
+
+    <div class="log" id="log"></div>
   </div>
-
-  <button class="btn-mode" id="btn-mode" onclick="send('MANUAL')" disabled>
-    <i class="ti ti-refresh" aria-hidden="true"></i>
-    <span id="mode-label">切換手動 / 自動</span>
-  </button>
-
-  <div class="log" id="log"></div>
 </div>
 
 <script>
@@ -132,4 +182,7 @@
     send('UP');
   }
 </script>
+</body>
+</html>
+
 
