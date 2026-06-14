@@ -27,17 +27,21 @@
     </button>
 
     <script>
-        // 請將這裡換成你 ESP32 的實際 IP
+        // 務必加上 http://，這很重要！
         const ESP32_URL = "http://172.20.10.12"; 
 
         async function send(cmd) {
+            console.log("嘗試發送指令:", cmd);
             try {
-                // 發送 GET 請求到 ESP32，例如: http://192.168.x.x/control?cmd=OPEN_DOWN
-                const response = await fetch(`${ESP32_URL}/control?cmd=${cmd}`);
-                console.log("Command sent:", cmd);
+                // 使用 fetch 發送請求
+                const response = await fetch(`${ESP32_URL}/control?cmd=${cmd}`, {
+                    method: 'GET',
+                    mode: 'no-cors' // 這個設定可以繞過大多數的 CORS 瀏覽器限制
+                });
+                console.log("指令發送完成 (可能無法讀取回傳內容)");
             } catch (error) {
-                console.error("無法連接到 ESP32:", error);
-                alert("無法連接到控制器，請檢查 Wi-Fi 是否正確。");
+                console.error("錯誤詳情:", error);
+                alert("發送失敗，請檢查網路是否連線。");
             }
         }
     </script>
