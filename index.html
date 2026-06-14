@@ -3,54 +3,36 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Smart Hanger Wi-Fi</title>
+    <title>Smart Hanger BLE</title>
     <style>
-        button {
-        -webkit-tap-highlight-color: transparent; /* 關閉點擊時的藍色陰影 */
-        touch-action: manipulation;               /* 優化觸控體驗 */
-        user-select: none;                        /* 防止選取文字 */
-        -webkit-user-select: none;
-        }
-        body { text-align: center; font-family: Arial; padding-top: 50px; }
-        button { padding: 20px 40px; margin: 10px; font-size: 18px; cursor: pointer; }
+        body { text-align: center; font-family: Arial; padding: 20px; }
+        button { padding: 30px 50px; margin: 20px; font-size: 20px; border-radius: 10px; }
     </style>
 </head>
 <body>
-
-    <h2>Smart Hanger Wi-Fi Control</h2>
-    <p>ESP32 IP: <span id="ip-display">等待輸入...</span></p>
-
-    <button
-        autocorrect="off" 
-        autocomplete="off"
-        onmousedown="send('OPEN_DOWN')" onmouseup="send('UP')"
-        ontouchstart="send('OPEN_DOWN')" ontouchend="send('UP')">
-        OPEN
-    </button>
-
-    <button
-        autocorrect="off" 
-        autocomplete="off"
-        onmousedown="send('CLOSE_DOWN')" onmouseup="send('UP')"
-        ontouchstart="send('CLOSE_DOWN')" ontouchend="send('UP')">
-        CLOSE
-    </button>
+    <h2>Smart Hanger Control</h2>
+    <button onclick="connect()">連線裝置</button>
+    <br>
+    <button onmousedown="send('OPEN_DOWN')" onmouseup="send('UP')" ontouchstart="send('OPEN_DOWN')" ontouchend="send('UP')">OPEN</button>
+    <button onmousedown="send('CLOSE_DOWN')" onmouseup="send('UP')" ontouchstart="send('CLOSE_DOWN')" ontouchend="send('UP')">CLOSE</button>
 
     <script>
-        const ESP32_URL = "http://172.20.10.12"; 
+        let char;
+        async function connect() {
+            try {
+                const device = await navigator.bluetooth.requestDevice({
+                    filters: [{ name: "SmartHanger_S3" }],
+                    optionalServices: ["12345678-1234-1234-1234-1234567890ab"]
+                });
+                const server = await device.gatt.connect();
+                const service = await server.getPrimaryService("12345678-1234-1234-1234-1234567890ab");
+                char = await service.getCharacteristic("abcd1234-1234-1234-1234-abcdef123456");
+                alert("Android 藍牙連線成功！");
+            } catch (e) { alert("連線失敗: " + e); }
+        }
 
         async function send(cmd) {
-            console.log("發送指令:", cmd);
-            try {
-                // 發送請求，不等待回傳，直接完成
-                fetch(`${ESP32_URL}/control?cmd=${cmd}`, {
-                    method: 'GET',
-                    mode: 'no-cors'
-                });
-                // 移除原本的 catch 彈窗，只在 console 輸出，避免干擾使用
-            } catch (error) {
-                console.log("請求發出，瀏覽器可能無法解析回傳，但指令應已送出");
-            }
+            if (char) await char.writeValue(new TextEncoder().encode(cmd));
         }
     </script>
 </body>
