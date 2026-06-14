@@ -2,17 +2,17 @@
 <html>
 <head>
     <meta charset="UTF-8">
-    <title>Smart Hanger BLE</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Smart Hanger Wi-Fi</title>
     <style>
-        body { text-align: center; font-family: Arial; }
-        button { padding: 15px 30px; margin: 10px; cursor: pointer; }
+        body { text-align: center; font-family: Arial; padding-top: 50px; }
+        button { padding: 20px 40px; margin: 10px; font-size: 18px; cursor: pointer; }
     </style>
 </head>
 <body>
 
-    <h2>Smart Hanger BLE</h2>
-
-    <button onclick="connect()">CONNECT</button><br><br>
+    <h2>Smart Hanger Wi-Fi Control</h2>
+    <p>ESP32 IP: <span id="ip-display">等待輸入...</span></p>
 
     <button
         onmousedown="send('OPEN_DOWN')" onmouseup="send('UP')"
@@ -27,31 +27,19 @@
     </button>
 
     <script>
-        let char;
-        const SERVICE_UUID = "12345678-1234-1234-1234-1234567890ab";
-        const CHAR_UUID    = "abcd1234-1234-1234-1234-abcdef123456";
-
-        async function connect() {
-            try {
-                const device = await navigator.bluetooth.requestDevice({
-                    filters: [{ name: "SmartHanger_S3" }],
-                    optionalServices: [SERVICE_UUID]
-                });
-                const server = await device.gatt.connect();
-                const service = await server.getPrimaryService(SERVICE_UUID);
-                char = await service.getCharacteristic(CHAR_UUID);
-                alert("Connected OK");
-            } catch (error) {
-                alert("Error: " + error);
-            }
-        }
+        // 請將這裡換成你 ESP32 的實際 IP
+        const ESP32_URL = "172.20.10.12"; 
 
         async function send(cmd) {
-            if (!char) return alert("Not connected");
-            const data = new TextEncoder().encode(cmd);
-            await char.writeValue(data);
+            try {
+                // 發送 GET 請求到 ESP32，例如: http://192.168.x.x/control?cmd=OPEN_DOWN
+                const response = await fetch(`${ESP32_URL}/control?cmd=${cmd}`);
+                console.log("Command sent:", cmd);
+            } catch (error) {
+                console.error("無法連接到 ESP32:", error);
+                alert("無法連接到控制器，請檢查 Wi-Fi 是否正確。");
+            }
         }
     </script>
-
 </body>
 </html>
