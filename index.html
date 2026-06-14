@@ -37,10 +37,35 @@
       background: #f8f9fa;
       border-bottom: 1px solid #eee;
     }
-    .status-dot { width: 12px; height: 12px; border-radius: 50%; background: #bbb; transition: 0.3s; }
-    .status-dot.connected { background: #00c853; box-shadow: 0 0 8px #00c853; }
+    .status-dot { 
+      width: 12px; height: 12px; border-radius: 50%; 
+      background: #bbb; transition: 0.3s; 
+    }
+    .status-dot.connected { 
+      background: #00c853; 
+      box-shadow: 0 0 8px #00c853; 
+    }
     
-    .control-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; padding: 20px; }
+    .btn-connect {
+      width: 100%;
+      margin: 15px 20px;
+      padding: 14px;
+      font-size: 16px;
+      font-weight: 600;
+      border-radius: 12px;
+      background: var(--primary);
+      color: white;
+      border: none;
+      cursor: pointer;
+    }
+    .btn-connect:hover { background: #0055dd; }
+
+    .control-grid { 
+      display: grid; 
+      grid-template-columns: 1fr 1fr; 
+      gap: 16px; 
+      padding: 0 20px 20px; 
+    }
     .btn-action {
       height: 140px;
       border-radius: 16px;
@@ -64,6 +89,8 @@
       font-size: 17px;
       font-weight: 600;
       border-radius: 16px;
+      background: #f0f0f0;
+      border: 1px solid #ddd;
     }
     .log {
       text-align: center;
@@ -89,6 +116,12 @@
       </div>
       <span class="mode-badge" id="mode-badge">—</span>
     </div>
+
+    <!-- 連線按鈕 -->
+    <button class="btn-connect" id="btn-connect" onclick="toggleConnect()">
+      <i class="ti ti-bluetooth" style="font-size:20px"></i>
+      <span id="connect-label">連線裝置</span>
+    </button>
 
     <div class="control-grid">
       <button class="btn-action close-btn" id="btn-close"
@@ -122,67 +155,96 @@
   let isManual = false;
   let holding = false;
 
-  function setLog(msg) { document.getElementById('log').textContent = msg; }
+  function setLog(msg) {
+    document.getElementById('log').textContent = msg;
+  }
 
   function setConnected(val) {
     connected = val;
-    document.getElementById('dot').className = 'dot' + (val ? ' on' : '');
+    const dot = document.getElementById('dot');
+    dot.className = 'status-dot' + (val ? ' connected' : '');
+    
     document.getElementById('conn-text').textContent = val ? '已連線 SmartHanger_S3' : '未連線';
-    document.getElementById('conn-label').textContent = val ? '中斷連線' : '連線裝置';
+    document.getElementById('connect-label').textContent = val ? '中斷連線' : '連線裝置';
+    
     document.getElementById('btn-close').disabled = !val;
     document.getElementById('btn-open').disabled = !val;
     document.getElementById('btn-mode').disabled = !val;
-    if (!val) { const b = document.getElementById('badge'); b.className = 'badge'; b.textContent = '—'; }
   }
 
   function updateModeUI() {
-    const b = document.getElementById('badge');
-    const l = document.getElementById('mode-label');
-    if (isManual) { b.className = 'badge manual'; b.textContent = '手動'; l.textContent = '切換為自動模式'; }
-    else { b.className = 'badge auto'; b.textContent = '自動'; l.textContent = '切換為手動模式'; }
+    const badge = document.getElementById('mode-badge');
+    const label = document.getElementById('mode-label');
+    if (isManual) {
+      badge.className = 'mode-badge manual';
+      badge.textContent = '手動';
+      label.textContent = '切換為自動模式';
+    } else {
+      badge.className = 'mode-badge auto';
+      badge.textContent = '自動';
+      label.textContent = '切換為手動模式';
+    }
   }
 
   async function toggleConnect() {
-    if (connected) { char = null; setConnected(false); setLog('已中斷連線'); return; }
+    if (connected) {
+      char = null;
+      setConnected(false);
+      setLog('已中斷連線');
+      return;
+    }
     try {
       setLog('搜尋中...');
       const device = await navigator.bluetooth.requestDevice({
         filters: [{ name: 'SmartHanger_S3' }],
         optionalServices: ['12345678-1234-1234-1234-1234567890ab']
       });
-      device.addEventListener('gattserverdisconnected', () => { setConnected(false); setLog('裝置已斷線'); char = null; });
+      device.addEventListener('gattserverdisconnected', () => {
+        setConnected(false);
+        setLog('裝置已斷線');
+        char = null;
+      });
       setLog('連線中...');
       const server = await device.gatt.connect();
       const service = await server.getPrimaryService('12345678-1234-1234-1234-1234567890ab');
       char = await service.getCharacteristic('abcd1234-1234-1234-1234-abcdef123456');
-      setConnected(true); isManual = false; updateModeUI(); setLog('連線成功');
-    } catch(e) { setLog('連線失敗：' + e.message); }
+      
+      setConnected(true);
+      isManual = false;
+      updateModeUI();
+      setLog('連線成功');
+    } catch(e) {
+      setLog('連線失敗：' + e.message);
+    }
   }
 
   async function send(cmd) {
     if (!char) return;
     try {
       await char.writeValue(new TextEncoder().encode(cmd));
-      if (cmd === 'MANUAL') { isManual = !isManual; updateModeUI(); setLog('切換為' + (isManual ? '手動' : '自動') + '模式'); }
-      else { setLog('已送出：' + cmd); }
-    } catch(e) { setLog('指令失敗：' + e.message); }
+      if (cmd === 'MANUAL') {
+        isManual = !isManual;
+        updateModeUI();
+        setLog('切換為' + (isManual ? '手動' : '自動') + '模式');
+      } else {
+        setLog('已送出：' + cmd);
+      }
+    } catch(e) {
+      setLog('指令失敗：' + e.message);
+    }
   }
 
-  function holdStart(cmd, el) {
-    if (!char || holding) return;
-    holding = true;
-    el.classList.add('pressing');
-    send(cmd);
-  }
-
-  function holdEnd(el) {
-    if (!holding) return;
-    holding = false;
-    el.classList.remove('pressing');
-    send('UP');
+  function sendHold(cmd) {
+    if (!char) return;
+    if (cmd === 'UP') {
+      holding = false;
+      send('UP');
+    } else {
+      if (holding) return;
+      holding = true;
+      send(cmd);
+    }
   }
 </script>
 </body>
 </html>
-
-
